@@ -37,7 +37,6 @@ class MinitaurEnv(object):
 
         self.act_mid = np.mean(self.model.actuator_ctrlrange, axis=1)
         self.act_rng = 0.5 * (self.model.actuator_ctrlrange[:,1] - self.model.actuator_ctrlrange[:,0])
-        print(self.act_mid, self.act_rng)
         nu = len(self.act_rng)
         self.action_space = Box(low=-1., high=1., shape=(nu,), dtype=np.float32)
 
@@ -49,17 +48,25 @@ class MinitaurEnv(object):
         ob = self.get_obs(self.data)
         return ob
 
-
     def get_obs(self, data):
         return np.concatenate([data.qpos.ravel(), data.qvel.ravel()])
 
     def print_status(self):
-
         # print('forward vel : {:.2f}'.format(self.data.qvel[0]))
         t_rpy = euler2quat(np.array([0., 0., 2.*np.pi]))
         rot = self.data.body_xquat[self.chassis_bid]
 
         print('rot : ', t_rpy, rot)
+
+    def set_state_from_robot(self, measured_state):
+        state = self.get_state()
+        for i in range(4):
+            state.qpos[self.motor_bids[i]] = measured_state.joint_swing[i]
+            print(state.qpos[self.extension_bids[i]], measured_state.joint_extension[i])
+            print(state.qpos[self.motor_bids[i]], measured_state.joint_swing[i])
+            state.qpos[self.extension_bids[i]] = measured_state.joint_extension[i]
+        self.sim.set_state(state)
+        self.sim.forward()
 
     def get_rew(self, data):
         # rot = data.body_xmat[self.chassis_bid].reshape(3,3)
@@ -75,32 +82,15 @@ class MinitaurEnv(object):
         # return -data.qvel[2]# + 100*np.sum((rpy-t_rpy)**2)
         return 0*data.qvel[0] - np.sum((rpy-t_rpy)**2) #+ data.qvel[2]**2# + 1e-3*np.sum(np.square(jnts)) + 1e-3*np.sum(np.square(ext))
 
-    # def get_rew(self, data):
-    #     rot = data.body_xmat[self.chassis_bid].reshape(3,3)
-    #     rpy = mat2euler(rot)
-    #     t_rpy = mat2quat(np.eye(3))
-    #     jnts = [data.qpos[jnt_addr] for jnt_addr in self.motor_bids]
-    #     ext  = [data.qpos[jnt_addr] for jnt_addr in self.extension_bids]
-    #     # return (data.qvel[0]-0.6)**2 + 10*np.sum((rpy-t_rpy)**2) #np.sum(data.qpos[:3]**2) #+ 10.*data.qpos[3]**2
-    #     # return -data.qvel[2]# + 100*np.sum((rpy-t_rpy)**2)
-    #     # return (data.qvel[0]-2)**2 + np.sum((rpy-t_rpy)**2) #+ data.qvel[2]**2# + 1e-3*np.sum(np.square(jnts)) + 1e-3*np.sum(np.square(ext))
-    #     return (rpy[0] - np.pi * 2)**2
-
-
     def step(self, a):
-
         ctrl = np.clip(a, -1.0, 1.0)
         ctrl = self.act_mid + ctrl * self.act_rng
-
         self.data.ctrl[:] = ctrl
-
         self.sim.step()
-
         ob = self.get_obs(self.data)
         rew = self.get_rew(self.data)
         done = False
         return ob, rew, done, {}
-
 
     def render(self):
         self.viewer.render()

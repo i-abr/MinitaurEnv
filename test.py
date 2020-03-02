@@ -3,10 +3,11 @@
 
 import numpy as np
 
-
 from minitaur_env import MinitaurEnv
 from minitaur_multmodel import MinitaurMultModel
 from scipy.signal import savgol_filter
+import sys
+sys.path.append('../')
 
 import matplotlib.pyplot as plt
 
@@ -54,11 +55,11 @@ t = 0
 while True:
 
     state = env.get_state()
-    u_seq = mppi(state, model, u_seq, horizon)
+    #u_seq = mppi(state, model, u_seq, horizon)
 
     # obs, rew, done, _ = env.step(u_seq[0]*0 + np.array([0.]*4 + [-0]*4) )
     # obs, rew, done, _ = env.step(u_seq[0]*0 + np.sin(np.pi*t/30))
-    obs, rew, done, _ = env.step(u_seq[0])
+    obs, rew, done, _ = env.step(env.action_space.sample()*0)
     env.render()
     u_seq[:-1] = u_seq[1:]
     u_seq[-1]  = np.zeros(env.action_space.shape[0])
