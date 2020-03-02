@@ -35,10 +35,10 @@
           <position kp='50' joint="motor_back_rightR_joint"   ctrlrange='-0.5 0.5' name="motor_back_rightR_joint"/>
           <position kp='50' joint="motor_front_leftL_joint"   ctrlrange='-0.5 0.5' name="motor_front_leftL_joint"/>
           <position kp='50' joint="motor_front_rightR_joint"  ctrlrange='-0.5 0.5' name="motor_front_rightR_joint"/>
-          <position kp='220' joint="motor_back_leftL_extension"    ctrlrange='0 0.2' name="motor_back_leftL_extension" />
+          <!-- <position kp='220' joint="motor_back_leftL_extension"    ctrlrange='0 0.2' name="motor_back_leftL_extension" />
           <position kp='220' joint="motor_back_rightR_extension"   ctrlrange='0 0.2' name="motor_back_rightR_extension"/>
           <position kp='220' joint="motor_front_leftL_extension"   ctrlrange='0 0.2' name="motor_front_leftL_extension"/>
-          <position kp='220' joint="motor_front_rightR_extension"  ctrlrange='0 0.2' name="motor_front_rightR_extension"/>
+          <position kp='220' joint="motor_front_rightR_extension"  ctrlrange='0 0.2' name="motor_front_rightR_extension"/> -->
 
           <!-- <velocity kv='200' gear='1' joint="motor_back_leftL_joint"    ctrlrange='-0.7 0.7'  name="motor_back_leftL_joint"/>
           <velocity kv='200' gear='1' joint="motor_back_rightR_joint"   ctrlrange='-0.7 0.7'  name="motor_back_rightR_joint"/>
