@@ -6,11 +6,9 @@ from quatmath import mat2euler, mat2quat, euler2quat
 
 class MinitaurEnv(object):
 
-
-    def __init__(self, frame_skip=20, viewer=True):
+    def __init__(self, frame_skip=5, viewer=True):
 
         self.frame_skip = frame_skip
-
         model_path = './minitaur_run.xml'
 
         self.model = load_model_from_path(model_path)
@@ -21,17 +19,17 @@ class MinitaurEnv(object):
 
         self.chassis_bid = self.model.body_name2id('base_chassis_link')
         self.motor_bids  = [
-                self.model.get_joint_qpos_addr('motor_back_leftL_joint'),
-                self.model.get_joint_qpos_addr('motor_back_rightR_joint'),
                 self.model.get_joint_qpos_addr('motor_front_leftL_joint'),
-                self.model.get_joint_qpos_addr('motor_front_rightR_joint')
+                self.model.get_joint_qpos_addr('motor_back_leftL_joint'),
+                self.model.get_joint_qpos_addr('motor_front_rightR_joint'),
+                self.model.get_joint_qpos_addr('motor_back_rightR_joint'),
             ]
 
         self.extension_bids  = [
-                self.model.get_joint_qpos_addr('motor_back_leftL_extension'),
-                self.model.get_joint_qpos_addr('motor_back_rightR_extension'),
                 self.model.get_joint_qpos_addr('motor_front_leftL_extension'),
-                self.model.get_joint_qpos_addr('motor_front_rightR_extension')
+                self.model.get_joint_qpos_addr('motor_back_leftL_extension'),
+                self.model.get_joint_qpos_addr('motor_front_rightR_extension'),
+                self.model.get_joint_qpos_addr('motor_back_rightR_extension'),
             ]
 
 
@@ -62,9 +60,9 @@ class MinitaurEnv(object):
         state = self.get_state()
         for i in range(4):
             state.qpos[self.motor_bids[i]] = measured_state.joint_swing[i]
-            print(state.qpos[self.extension_bids[i]], measured_state.joint_extension[i])
-            print(state.qpos[self.motor_bids[i]], measured_state.joint_swing[i])
             state.qpos[self.extension_bids[i]] = measured_state.joint_extension[i]
+        state.qpos[:2] = measured_state.pose[:2]
+        state.qpos[3:7] = measured_state.orientation
         self.sim.set_state(state)
         self.sim.forward()
 
@@ -74,13 +72,13 @@ class MinitaurEnv(object):
         # rpy = mat2quat(rot)
         rpy = rot
         # t_rpy = mat2quat(np.eye(3))
-        # t_rpy = np.array([1., 0., 0., 0.])
-        t_rpy = euler2quat(np.array([0., 0., 2.*np.pi]))
+        t_rpy = np.array([1., 0., 0., 0.])
+        # t_rpy = euler2quat(np.array([0., 2.*np.pi, 0.]))
         jnts = [data.qpos[jnt_addr] for jnt_addr in self.motor_bids]
         ext  = [data.qpos[jnt_addr] for jnt_addr in self.extension_bids]
         # return (data.qvel[0]-0.6)**2 + 10*np.sum((rpy-t_rpy)**2) #np.sum(data.qpos[:3]**2) #+ 10.*data.qpos[3]**2
         # return -data.qvel[2]# + 100*np.sum((rpy-t_rpy)**2)
-        return 0*data.qvel[0] - np.sum((rpy-t_rpy)**2) #+ data.qvel[2]**2# + 1e-3*np.sum(np.square(jnts)) + 1e-3*np.sum(np.square(ext))
+        return -(data.qpos[0]-0.5)**2-np.sum((rpy-t_rpy)**2) #+ data.qvel[2]**2# + 1e-3*np.sum(np.square(jnts)) + 1e-3*np.sum(np.square(ext))
 
     def step(self, a):
         ctrl = np.clip(a, -1.0, 1.0)

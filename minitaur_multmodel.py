@@ -23,6 +23,15 @@ class MinitaurMultModel(MinitaurEnv):
             sim.set_state(state)
         self.pool.forward()
 
+    def set_state(self, measured_state, base_state):
+        for i in range(4):
+            base_state.qpos[self.motor_bids[i]] = measured_state.joint_swing[i]
+            base_state.qpos[self.extension_bids[i]] = measured_state.joint_extension[i]
+        base_state.qpos[:2] = measured_state.pose[:2]
+        base_state.qpos[3:7] = measured_state.orientation
+        for sim in self.pool.sims:
+            sim.set_state(base_state)
+        self.pool.forward()
 
     def reset(self):
         self.pool.reset()

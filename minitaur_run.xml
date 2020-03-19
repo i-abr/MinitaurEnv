@@ -1,7 +1,7 @@
 <mujoco model='minitaur_run'>
 
-    <!-- <option gravity='0 0 -9.81' timestep="0.005"/> -->
-    <option gravity='0 0 0' timestep="0.005"/>
+    <option gravity='0 0 -9.81' timestep="0.005"/>
+    <!-- <option gravity='0 0 0' timestep="0.005"/> -->
 
     <compiler angle='radian' />
     <size njmax='500' nconmax='100'/>
@@ -24,21 +24,22 @@
         <light cutoff="100" diffuse="1 1 1" dir="-0 0 -1.3" directional="true" exponent="1" pos="0 0 1.3" specular=".1 .1 .1" castshadow="false"/>
 
         <!-- <geom name='floor' pos='0 0 -0.2' size='10 10 0.01' type='plane' contype='3'/> -->
-        <!-- <geom name='floor' pos='0 0 0' size='20 10 .01' type='plane' material="MatPlane" condim='3' friction='1.6 0.005 0.0001'/> -->
+        <geom name='floor' pos='0 0 0' size='20 10 .01' type='plane' material="MatPlane" condim='3' friction='1.6 0.005 0.0001'/>
 
         <include file='minitaur.xml'/>
     </worldbody>
 
 
     <actuator>
-          <position kp='50' joint="motor_back_leftL_joint"    ctrlrange='-0.5 0.5' name="motor_back_leftL_joint"/>
-          <position kp='50' joint="motor_back_rightR_joint"   ctrlrange='-0.5 0.5' name="motor_back_rightR_joint"/>
-          <position kp='50' joint="motor_front_leftL_joint"   ctrlrange='-0.5 0.5' name="motor_front_leftL_joint"/>
-          <position kp='50' joint="motor_front_rightR_joint"  ctrlrange='-0.5 0.5' name="motor_front_rightR_joint"/>
-          <!-- <position kp='220' joint="motor_back_leftL_extension"    ctrlrange='0 0.2' name="motor_back_leftL_extension" />
-          <position kp='220' joint="motor_back_rightR_extension"   ctrlrange='0 0.2' name="motor_back_rightR_extension"/>
-          <position kp='220' joint="motor_front_leftL_extension"   ctrlrange='0 0.2' name="motor_front_leftL_extension"/>
-          <position kp='220' joint="motor_front_rightR_extension"  ctrlrange='0 0.2' name="motor_front_rightR_extension"/> -->
+          <position kp='2' joint="motor_front_leftL_joint"   ctrlrange='-0.2 0.2' name="motor_front_leftL_joint"/>
+          <position kp='2' joint="motor_back_leftL_joint"    ctrlrange='-0.2 0.2' name="motor_back_leftL_joint"/>
+          <position kp='2' joint="motor_front_rightR_joint"  ctrlrange='-0.2 0.2' name="motor_front_rightR_joint"/>
+          <position kp='2' joint="motor_back_rightR_joint"   ctrlrange='-0.2 0.2' name="motor_back_rightR_joint"/>
+
+          <position kp='120' gear='1' joint="motor_front_leftL_extension"   ctrlrange='0.12 0.2' name="motor_front_leftL_extension"/>
+          <position kp='120' gear='1' joint="motor_back_leftL_extension"    ctrlrange='0.12 0.2' name="motor_back_leftL_extension" />
+          <position kp='120' gear='1' joint="motor_front_rightR_extension"  ctrlrange='0.12 0.2' name="motor_front_rightR_extension"/>
+          <position kp='120' gear='1' joint="motor_back_rightR_extension"   ctrlrange='0.12 0.2' name="motor_back_rightR_extension"/>
 
           <!-- <velocity kv='200' gear='1' joint="motor_back_leftL_joint"    ctrlrange='-0.7 0.7'  name="motor_back_leftL_joint"/>
           <velocity kv='200' gear='1' joint="motor_back_rightR_joint"   ctrlrange='-0.7 0.7'  name="motor_back_rightR_joint"/>
